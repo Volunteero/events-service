@@ -2,8 +2,8 @@ import sys
 import warlock
 from flask import Flask, request
 from bson.objectid import ObjectId
-from event_service import client, db
-from event_service.controllers.json_controller import *
+from event_service.app import client, db
+from .json_controller import *
 from event_service.models.Event import Event
 
 class MongoDBManager():

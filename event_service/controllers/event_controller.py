@@ -1,7 +1,7 @@
 import sys
 from flask import Flask, request
-from event_service import app
-from controllers.database_controller import MongoDBManager
+from event_service.app import app
+from .database_controller import MongoDBManager
 mongodb = MongoDBManager()
 
 @app.route("/")
