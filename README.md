@@ -161,5 +161,29 @@ Output
 }
 ```
 
-### Local Deployment
-coming
+### Setup
+
+#### Virtualenv
+
+If you don't have virtualenv installed: ( http://docs.python-guide.org/en/latest/dev/virtualenvs/ )
+* ``pip install virtualenv``
+* ``cd myprojectfolder``
+* ``virtualenv myenv``
+
+Activate virtualenv:
+* ``"myenv/Scripts/activate"``
+
+#### Set up project
+
+Virtualenv must be activated latest at step 3
+
+* ``git clone https://github.com/Volunteero/events-service.git``
+* ``cd events-service``
+* ``pip install -r requirements.txt``
+* ``cd event_service``
+* ``set FLASK_APP=app.py``
+* ``set MONGO_URL_DEV=mongodb+srv://USER:PASSWORD@proepvolunteero-rvsmk.mongodb.net/DATABASE_NAME``
+* ``flask run``
+
+
+
