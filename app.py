@@ -14,4 +14,4 @@ if not MONGO_URL:
 client = MongoClient(MONGO_URL)
 db = client.get_default_database()
 
-import event_service.controllers.event_controller
+import controllers.event_controller
