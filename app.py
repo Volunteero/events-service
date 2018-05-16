@@ -1,7 +1,7 @@
 import os, sys
 from pymongo import MongoClient
 from flask import Flask, request
-from flask import CORS
+from flask-cors import CORS
 from bson.objectid import ObjectId
 import json
 from bson import json_util
