@@ -1,6 +1,6 @@
 import sys
 from flask import Flask, request
-from event_service.app import app
+from app import app
 from .database_controller import MongoDBManager
 mongodb = MongoDBManager()
 
