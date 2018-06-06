@@ -1,20 +1,16 @@
-import os, sys
+import os
 from pymongo import MongoClient
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
-from bson.objectid import ObjectId
-import json
-from bson import json_util
+
 app = Flask(__name__)
 CORS(app)
 
 # connect to mongodb
 MONGO_URL = os.environ.get('MONGO_URL')
-if not MONGO_URL:
-    MONGO_URL = os.environ.get('MONGO_URL_DEV')
 
 client = MongoClient(MONGO_URL)
-db = client.get_default_database()
+db = client.get_database()
 
 import controllers.event_controller
 

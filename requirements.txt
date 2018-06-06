@@ -4,3 +4,4 @@ dnspython
 warlock
 gunicorn
 flask-cors
+requests

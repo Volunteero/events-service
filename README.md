@@ -1,6 +1,7 @@
 # events-service
 
 Takes care of Volunteero's event-related operations. Events-service is implemented with Python and MongoDB.
+Find it on https://volunteero-events.herokuapp.com/
 
 ## How to use?
 
@@ -93,7 +94,7 @@ Output
 
 ### Create events
 
-POST **/events** </br>
+POST **/events?token=<ACCESS_TOKEN>** </br>
 Creates a new event based on content, returns newly created event-id when successful
 ```
 Input example:
@@ -115,7 +116,7 @@ Output example:
 
 ### Delete (archive) event
 
-PATCH **/events/id** </br>
+PATCH **/events/id?token=<ACCESS_TOKEN>** </br>
 Archives an event with the given event id. Used instead of deletion to keep the data. Returns the changed event.
 ```
 Output
@@ -136,7 +137,7 @@ Output
 
 ### Update event
 
-PUT **/events/id** </br>
+PUT **/events/id?token=<ACCESS_TOKEN>** </br>
 Updates an event with the given event id (in URL path), based on the field and value sent in request. Returns the changed event.
 ```
 Input example (in body):

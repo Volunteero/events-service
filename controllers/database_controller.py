@@ -1,68 +1,60 @@
 import sys
-import warlock
-from flask import Flask, request
-from bson.objectid import ObjectId
 from app import client, db
 from .json_controller import *
-from models.Event import Event
+from .authentication_manager import is_allowed
 
-class MongoDBManager():
+
+# TODO: error handling
+class MongoDBManager:
 
     def __init__(self):
         self.events_col = db.events
 
-    def create(self, jsondata):
-        try:
-            event = json_to_event(jsondata)
+    def create(self, json_data, token):
+        event = json_to_event(json_data)
+        allowed = is_allowed(token, event['organization_id'], 'createEvent')
+        if allowed:
             event_id = self.events_col.insert_one(event.__original__).inserted_id
             return str(event_id)
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        else:
+            return "Failed to authorize"
 
     def get_all(self):
-        try:
-            events_cursor = self.events_col.find()
-            events_json = []
-            for event in events_cursor:
-                events_json.append(format_ObjectId(event))
-            return to_json(events_json)
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        events_cursor = self.events_col.find()
+        events_json = []
+        for event in events_cursor:
+            events_json.append(format_ObjectId(event))
+        return to_json(events_json)
 
     def get_all_by(self, field, value):
-        try:
-            events_cursor = self.events_col.find({field: value})
-            events_json = []
-            for event in events_cursor:
-                events_json.append(format_ObjectId(event))
-            return to_json(events_json)
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        events_cursor = self.events_col.find({field: value})
+        events_json = []
+        for event in events_cursor:
+            events_json.append(format_ObjectId(event))
+        return to_json(events_json)
 
     def get_by_id(self, id):
-        try:
-            event = self.events_col.find_one({"_id": ObjectId(id)})
-            return to_json(format_ObjectId(event))
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        event = self.events_col.find_one({"_id": ObjectId(id)})
+        return to_json(format_ObjectId(event))
 
-    def archive(self, id):
-        try:
+    def archive(self, id, token):
+        event = self.events_col.find_one({"_id": ObjectId(id)})
+        allowed = is_allowed(token, event['organization_id'], 'closeEvent')
+
+        if allowed:
             self.events_col.update_one({'_id': ObjectId(id)}, {"$set": {"available": False}}, upsert=True)
             return self.get_by_id(id)
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        else:
+            return "Failed to authorize"
 
-    def update(self, id, field, value):
-        try:
-            # TODO: validate with the Event obj
+    def update(self, id, field, value, token):
+        event = self.events_col.find_one({"_id": ObjectId(id)})
+        # TODO: set correct action
+        allowed = is_allowed(token, event['organization_id'], 'setNumberOfEventPoints')
+
+        # TODO: validate with the Event obj
+        if allowed:
             self.events_col.update_one({'_id': ObjectId(id)}, {"$set": {field: value}}, upsert=True)
             return self.get_by_id(id)
-        except:
-            print(str(sys.exc_info()[1]))
-            return "Failed"
+        else:
+            return "Failed to authorize"

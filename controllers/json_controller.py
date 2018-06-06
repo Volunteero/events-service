@@ -1,12 +1,12 @@
 import sys
 import json
-from bson import json_util
-from bson.objectid import ObjectId
+from bson import json_util, ObjectId
 from models.Event import Event
+
 
 # convert mongodb to json
 def to_json(data):
-	return json.dumps(data, default=json_util.default, indent=2, sort_keys=True)
+    return json.dumps(data, default=json_util.default, indent=2, sort_keys=True)
 
 
 def json_to_event(data):
@@ -26,6 +26,7 @@ def json_to_event(data):
     except Exception as e:
         print(getattr(e, 'message', str(e)))
         raise e
+
 
 def format_ObjectId(event):
     event['_id'] = str(event['_id'])
