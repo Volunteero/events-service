@@ -8,11 +8,11 @@ CORS(app)
 
 # connect to mongodb
 MONGO_URL = os.environ.get('MONGO_URL')
-
 client = MongoClient(MONGO_URL)
 db = client.get_database()
 
-import controllers.event_controller
+# import api start point
+import api.api_global
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

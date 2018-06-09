@@ -1,9 +1,11 @@
 # events-service
 
-Takes care of Volunteero's event-related operations. Events-service is implemented with Python and MongoDB.
+Takes care of Volunteero's event-related operations. Events-service is implemented with Python, Flask and MongoDB.
 Find it on https://volunteero-events.herokuapp.com/
 
 ## How to use?
+
+## Events
 
 ### General event format
 - id: ObjectId('xxxxxxxxxxxxxxxxxxxxxxxx') is used internally in MongoDB. For retrieval, simple 'xxxxxxxxxxxxxxxxxxxxxxxx' is used.
@@ -29,7 +31,7 @@ Find it on https://volunteero-events.herokuapp.com/
 GET **/events** </br>
 Gets all events
 ```
-Output for 2 events:
+Example output for 2 events:
 [
   {
     "_id": "000000000000000000000000",
@@ -60,23 +62,23 @@ Output for 2 events:
 ]
 ```
 
-POST **/events/find** </br>
+POST **/events/by** </br>
 Gets all events that match the given criteria in request body, can be used for any property (name, category, available, points, ...)
 ```
-Input example:
+Example input:
 {
 	"field":"available",
 	"value":true
 }
 
-Output:
+Example output:
 Outputs all events that match the criteria in the same format as GET /events (above).
 ```
 
 GET **/events/id** </br>
-Returns an event with the given event id.
+Returns an event with the given event ID.
 ```
-Output
+Example output
 {
   "_id": "000000000000000000000000",
   "name":"Help to build a shelter",
@@ -97,7 +99,7 @@ Output
 POST **/events?token=<ACCESS_TOKEN>** </br>
 Creates a new event based on content, returns newly created event-id when successful
 ```
-Input example:
+Example input:
 {  
   "name":"Help to build a shelter",
   "description":"Come and lets build a shelter together!",
@@ -110,16 +112,16 @@ Input example:
   "organization_id":"000000000000000000000000"
 }
 
-Output example:
+Example output:
 000000000000000000000000
 ```
 
 ### Delete (archive) event
 
-PATCH **/events/id?token=<ACCESS_TOKEN>** </br>
-Archives an event with the given event id. Used instead of deletion to keep the data. Returns the changed event.
+DELETE **/events/id?token=<ACCESS_TOKEN>** </br>
+Archives an event with the given event ID. Used instead of deletion to keep the data. Returns the changed event.
 ```
-Output
+Example output
 {
   "_id": "000000000000000000000000",
   "name":"Help to build a shelter",
@@ -138,15 +140,15 @@ Output
 ### Update event
 
 PUT **/events/id?token=<ACCESS_TOKEN>** </br>
-Updates an event with the given event id (in URL path), based on the field and value sent in request. Returns the changed event.
+Updates an event with the given event ID (in URL path), based on the field and value sent in request. Returns the changed event.
 ```
-Input example (in body):
+Example input (in body):
 {
   "field": "name",
   "value":"This is my new name",
 }
 
-Output
+Example output
 {
   "_id": "000000000000000000000000",
   "name":"This is my new name",
@@ -162,7 +164,77 @@ Output
 }
 ```
 
-### Setup
+## Participation
+
+
+### Retrieve participations
+
+GET **/participation** </br>
+Gets all participating volunteers for all events
+```
+Example output for 2 events:
+[
+  {
+    "_id": "0000000000000000000000yy",
+    "event_id": "00000000000000000000000y",
+    "participators": [
+      "user122",
+      "user111"
+    ]
+  },
+  {
+    "_id": "0000000000000000000000xx",
+    "event_id": "00000000000000000000000x",
+    "participators": [
+      "user112",
+      "user111",
+      "user113",
+      "user114"
+    ]
+  }
+]
+```
+
+GET **/participation?event=<EVENT_ID>** </br>
+Gets all participating volunteers for this events
+```
+Outputs participators for one event, in the same format as GET /participation/ applies for one event.
+```
+
+GET **/participation/user?user=<USER_ID>** </br>
+Gets a list of events (IDs) where user with the given ID participates.
+```
+Example output:
+[
+  "00000000000000000000000x",
+  "00000000000000000000000y",
+  "00000000000000000000000z",
+  "00000000000000000000000c"
+]
+```
+
+### Join events
+POST **/participation/join** </br>
+Let's user participate in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
+```
+Example input:
+{
+	"event":"00000000000000000000000x",
+	"user":"user1"
+}
+
+Outputs the updated event participation, in format of GET /participation?event=<EVENT_ID>.
+```
+
+### Leave events
+POST **/participation/leave** </br>
+Let's user leave/cancel participation in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
+```
+Input and output are the same as POST /participation/join.
+```
+
+
+## Setup
 
 #### Virtualenv
 
@@ -183,7 +255,7 @@ Virtualenv must be activated latest at step 3
 * ``pip install -r requirements.txt``
 * ``cd event_service``
 * ``set FLASK_APP=app.py``
-* ``set MONGO_URL_DEV=mongodb+srv://USER:PASSWORD@proepvolunteero-rvsmk.mongodb.net/DATABASE_NAME``
+* ``set MONGO_URL=mongodb+srv://USER:PASSWORD@proepvolunteero-rvsmk.mongodb.net/DATABASE_NAME``
 * ``flask run``
 
 

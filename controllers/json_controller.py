@@ -31,3 +31,10 @@ def json_to_event(data):
 def format_ObjectId(event):
     event['_id'] = str(event['_id'])
     return event
+
+
+def cursor_to_json(cursor):
+    arr = []
+    for doc in cursor:
+        arr.append(format_ObjectId(doc))
+    return to_json(arr)
