@@ -75,7 +75,7 @@ Example output:
 Outputs all events that match the criteria in the same format as GET /events (above).
 ```
 
-GET **/events/id** </br>
+GET **/events/<ID>** </br>
 Returns an event with the given event ID.
 ```
 Example output
@@ -118,7 +118,7 @@ Example output:
 
 ### Delete (archive) event
 
-DELETE **/events/id?token=<ACCESS_TOKEN>** </br>
+DELETE **/events/<ID>?token=<ACCESS_TOKEN>** </br>
 Archives an event with the given event ID. Used instead of deletion to keep the data. Returns the changed event.
 ```
 Example output
@@ -139,7 +139,7 @@ Example output
 
 ### Update event
 
-PUT **/events/id?token=<ACCESS_TOKEN>** </br>
+PUT **/events/<ID>?token=<ACCESS_TOKEN>** </br>
 Updates an event with the given event ID (in URL path), based on the field and value sent in request. Returns the changed event.
 ```
 Example input (in body):
