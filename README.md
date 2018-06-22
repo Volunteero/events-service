@@ -97,7 +97,8 @@ Example output
 ### Create events
 
 POST **/events?token=<ACCESS_TOKEN>** </br>
-Creates a new event based on content, returns newly created event-id when successful
+Creates a new event based on content, returns newly created event-id when successful. 
+Adds also event to organization-service under given organization.
 ```
 Example input:
 {  
@@ -113,7 +114,13 @@ Example input:
 }
 
 Example output:
-000000000000000000000000
+{
+  "event_id":xxxxxxxxxxxxxxxxxxxxxxxx
+}
+
+Errors:
+500 -> linking event to the organization failed
+401 -> unauthorized (invalid or missing access token)
 ```
 
 ### Delete (archive) event
@@ -135,6 +142,10 @@ Example output
   "organization_id":"000000000000000000000000",
   "available": false
 }
+
+Errors:
+404 -> event not found
+401 -> unauthorized (invalid or missing access token)
 ```
 
 ### Update event
@@ -162,6 +173,10 @@ Example output
   "organization_id":"000000000000000000000000",
   "available": true
 }
+
+Errors:
+404 -> event not found
+401 -> unauthorized (invalid or missing access token)
 ```
 
 ## Participation
@@ -177,19 +192,20 @@ Example output for 2 events:
   {
     "_id": "0000000000000000000000yy",
     "event_id": "00000000000000000000000y",
-    "participators": [
+    "enrolled_participants": [
       "user122",
       "user111"
+    ],
+    "arrived_participants": [
+      "user122",
     ]
   },
   {
     "_id": "0000000000000000000000xx",
     "event_id": "00000000000000000000000x",
-    "participators": [
+    "enrolled_participants": [
       "user112",
-      "user111",
-      "user113",
-      "user114"
+      "user133",
     ]
   }
 ]
@@ -202,20 +218,14 @@ Outputs participators for one event, in the same format as GET /participation/ a
 ```
 
 GET **/participation/user?user=<USER_ID>** </br>
-Gets a list of events (IDs) where user with the given ID participates.
+Gets a list of events where user with the given ID participates.
 ```
-Example output:
-[
-  "00000000000000000000000x",
-  "00000000000000000000000y",
-  "00000000000000000000000z",
-  "00000000000000000000000c"
-]
+Outputs a list of events, same format as GET /events
 ```
 
 ### Join events
-POST **/participation/sign_up** </br>
-Let's user participate in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
+POST **/participation/enroll** </br>
+Let's user enroll in a given event, based on event ID and user ID. Updates also "volunteers" field of the event object.
 ```
 Example input:
 {
@@ -228,11 +238,33 @@ Outputs the updated event participation, in format of GET /participation?event=<
 
 ### Leave events
 POST **/participation/leave** </br>
-Let's user leave/leave participation in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
+Let's user leave/cancel participation in a given event, based on event ID and user ID. Updates also "volunteers" field of the event object.
 ```
-Input and output are the same as POST /participation/sign_up.
+Input and output are the same as POST /participation/enroll.
 ```
 
+
+### Mark user as arrived (verify participation)
+POST **/participation/arrived?event=<EVENT_ID>&user=<USER_ID>** </br>
+Stores user arrival to the event.
+```
+Input body is empty, values are in the URL.
+
+Outputs all participants of this event, like output of GET /participation?event=<EVENT_ID>.
+```
+
+### Gets user status for given event
+GET **/participation/arrived?event=<EVENT_ID>&user=<USER_ID>** </br>
+Gets if user has enrolled for the event, and if user arrived to the event.
+```
+Input body is empty, values are in the URL.
+
+Example output:
+{
+  "arrived": true,
+  "enrolled": true
+}
+```
 
 ## Setup
 
