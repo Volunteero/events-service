@@ -1,6 +1,6 @@
 import os
 from pymongo import MongoClient
-from flask import Flask
+from flask import Flask, abort
 from flask_cors import CORS
 
 app = Flask(__name__)

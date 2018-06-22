@@ -1,7 +1,7 @@
 import sys
-from app import client, db
+from app import client, db, abort
 from .json_controller import *
-from .authentication_manager import is_allowed
+from .authorization_manager import is_allowed
 
 
 # TODO: error handling
@@ -14,11 +14,13 @@ class MongoManageEvents:
     def create(self, json_data, token):
         event = json_to_event(json_data)
         allowed = is_allowed(token, event['organization_id'], 'createEvent')
+
         if allowed:
             event_id = self.events_col.insert_one(event.__original__).inserted_id
-            return str(event_id)
+            result = {'event_id': str(event_id)}
+            return to_json(result)
         else:
-            return "Failed to authorize"
+            abort(401)
 
     def get_all(self):
         events_cursor = self.events_col.find()
@@ -30,20 +32,27 @@ class MongoManageEvents:
 
     def get_by_id(self, id):
         event = self.events_col.find_one({"_id": ObjectId(id)})
-        return to_json(format_ObjectId(event))
+        if event is not None:
+            return to_json(format_ObjectId(event))
+        else:
+            abort(404)
 
     def archive(self, id, token):
         event = self.events_col.find_one({"_id": ObjectId(id)})
-        allowed = is_allowed(token, event['organization_id'], 'closeEvent')
+        if event is None:
+            abort(404)
 
+        allowed = is_allowed(token, event['organization_id'], 'closeEvent')
         if allowed:
             self.events_col.update_one({'_id': ObjectId(id)}, {"$set": {"available": False}}, upsert=True)
             return self.get_by_id(id)
         else:
-            return "Failed to authorize"
+            abort(401)
 
     def update(self, id, field, value, token):
         event = self.events_col.find_one({"_id": ObjectId(id)})
+        if event is None:
+            abort(404)
         # TODO: set correct action
         allowed = is_allowed(token, event['organization_id'], 'setNumberOfEventPoints')
 
@@ -52,9 +61,9 @@ class MongoManageEvents:
             self.events_col.update_one({'_id': ObjectId(id)}, {"$set": {field: value}}, upsert=True)
             return self.get_by_id(id)
         else:
-            return "Failed to authorize"
+            abort(401)
 
-    def update_event_participators(self, event_id):
-        participators = self.participation_col.find_one({"event_id": event_id})['participators']
-        nr_participators = len(participators)
-        self.events_col.update_one({'_id': ObjectId(event_id)}, {"$set": {"volunteers": nr_participators}}, upsert=True)
+    def update_event_participants(self, event_id):
+        participants = self.participation_col.find_one({"event_id": event_id})['enrolled_participants']
+        nr_participants = len(participants)
+        self.events_col.update_one({'_id': ObjectId(event_id)}, {"$set": {"volunteers": nr_participants}}, upsert=True)
