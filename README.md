@@ -214,7 +214,7 @@ Example output:
 ```
 
 ### Join events
-POST **/participation/join** </br>
+POST **/participation/sign_up** </br>
 Let's user participate in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
 ```
 Example input:
@@ -228,9 +228,9 @@ Outputs the updated event participation, in format of GET /participation?event=<
 
 ### Leave events
 POST **/participation/leave** </br>
-Let's user leave/cancel participation in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
+Let's user leave/leave participation in a given event, based on event ID and user ID. Updates "volunteers" field of the event object itself as well.
 ```
-Input and output are the same as POST /participation/join.
+Input and output are the same as POST /participation/sign_up.
 ```
 
 
