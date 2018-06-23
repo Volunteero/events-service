@@ -16,7 +16,7 @@ schema = {
         'organization_id': {'type': 'string'},
         'available': {'type': 'boolean'},
     },
-    'additionalProperties': True,
+    'additionalProperties': False,
 }
 
 Event = warlock.model_factory(schema)
