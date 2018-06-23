@@ -9,8 +9,13 @@ from .external_services import *
 # TODO: error handling
 class MongoManageEvents:
 
+    # error messages
     authorization_error = "Invalid access token, request unauthorized."
     event_not_found_error = "Event not found."
+    event_created_organization_error = "Could not link event to organization. Event was not created."
+    event_created_search_error = "Could not send event to search service. Event was created, " \
+                                 "but cannot be found in the search service until added " \
+                                 "to the search service again via update request."
 
     def __init__(self):
         self.events_col = db.events
@@ -21,13 +26,21 @@ class MongoManageEvents:
         allowed = is_allowed(token, event['organization_id'], 'createEvent')
 
         if allowed:
+            # add event
             event_id = str(self.events_col.insert_one(event.__original__).inserted_id)
-            linking_to_organization = add_event_to_organization(event['organization_id'], event_id)
 
+            # link event to organization
+            linking_to_organization = add_event_to_organization(event['organization_id'], event_id)
             if linking_to_organization.status_code > 299:
                 self.events_col.remove({"_id": ObjectId(event_id)})
-                abort(500, "Could not link event to organization.") # or return original content from the response
+                abort(linking_to_organization.status_code, self.event_created_organization_error)  # or original content
 
+            # send event to search service
+            add_to_service = add_event_to_search(event, event_id)
+            if add_to_service.status_code > 299:
+                abort(add_to_service.status_code, self.event_created_search_error)  # or original content
+
+            # if we are this far, everything is fine
             result = {'event_id': event_id}
             return to_json(result)
         else:
