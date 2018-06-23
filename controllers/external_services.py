@@ -26,6 +26,7 @@ def add_new_event_to_search(event, event_id):
     event_body['points'] = event['points']
     event_body['organization_id'] = event['organization_id']
     event_body['id'] = event_id
+    event_body['type'] = 'event'
 
     entities = [event_body]
     body = {'entities': entities}
@@ -43,6 +44,7 @@ def add_updated_event_to_search(field, value, event_id):
     event_body = {}
     event_body[field] = value
     event_body['id'] = event_id
+    event_body['type'] = 'event'
 
     entities = [event_body]
     body = {'entities': entities}
