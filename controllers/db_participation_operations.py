@@ -1,7 +1,8 @@
 import sys
-from app import client, db
+from app import client, db, abort
 from .json_controller import *
 from .db_event_operations import MongoManageEvents
+from .external_services import give_influence_points
 
 event_manager = MongoManageEvents()
 
@@ -77,6 +78,7 @@ class MongoManageParticipations:
             {'$addToSet': {'arrived_participants': user_id}},
             upsert=True
         )
+        self.give_points(event_id, user_id)
         return self.get_participants(event_id)
 
     def verify_if_arrived(self, event_id, user_id):
@@ -88,3 +90,15 @@ class MongoManageParticipations:
         result = {'enrolled': bool(joined), 'arrived': bool(appeared)}
         return to_json(result)
 
+
+# external method to call user service
+    def give_points(self, event_id, user_id):
+        event = self.events_col.find_one({"_id": ObjectId(event_id)})
+        points = event['points']
+        success = give_influence_points(points, user_id)
+        if success.status_code > 299:
+            if success.status_code < 500:
+                abort(success.status_code, "Failed to give points to user, verify that user " + user_id + " exists.")
+            else:
+                abort(success.status_code, "Failed to give points to user.")
+        return

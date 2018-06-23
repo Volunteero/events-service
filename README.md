@@ -29,7 +29,7 @@ Find it on https://volunteero-events.herokuapp.com/
 ### Retrieve events
 
 GET **/events** </br>
-Gets all events
+Gets all events.
 ```
 Example output for 2 events:
 [
@@ -98,7 +98,9 @@ Example output
 
 POST **/events?token=<ACCESS_TOKEN>** </br>
 Creates a new event based on content, returns newly created event-id when successful. 
-Adds also event to organization-service under given organization.
+</br> Authentication-service: verifies permission.
+</br> Organization-service: adds given event id under its organization.
+</br> Search-service: adds new event to search.
 ```
 Example input:
 {  
@@ -127,6 +129,8 @@ Errors:
 
 DELETE **/events/<EVENT_ID>?token=<ACCESS_TOKEN>** </br>
 Archives an event with the given event ID. Used instead of deletion to keep the data. Returns the changed event.
+</br> Authentication-service: verifies permission.
+</br> Search-service: updates given event for the archived field.
 ```
 Example output
 {
@@ -152,6 +156,8 @@ Errors:
 
 PUT **/events/<EVENT_ID>?token=<ACCESS_TOKEN>** </br>
 Updates an event with the given event ID (in URL path), based on the field and value sent in request. Returns the changed event.
+</br> Authentication-service: verifies permission.
+</br> Search-service: updates given event for the changed field.
 ```
 Example input (in body):
 {
@@ -185,7 +191,7 @@ Errors:
 ### Retrieve participations
 
 GET **/participation** </br>
-Gets all participating volunteers for all events
+Gets all participating volunteers for all events.
 ```
 Example output for 2 events:
 [
@@ -212,20 +218,21 @@ Example output for 2 events:
 ```
 
 GET **/participation?event=<EVENT_ID>** </br>
-Gets all participating volunteers for this events
+Gets all enrolled volunteers for this events.
 ```
-Outputs participators for one event, in the same format as GET /participation/ applies for one event.
+Outputs participants for one event, in the same format as GET /participation/ applies for one event.
 ```
 
 GET **/participation/user?user=<USER_ID>** </br>
-Gets a list of events where user with the given ID participates.
+Gets a list of events where user with the given ID has enrolled.
 ```
-Outputs a list of events, same format as GET /events
+Outputs a list of events, same format as GET /events.
 ```
 
 ### Join events
 POST **/participation/enroll** </br>
 Let's user enroll in a given event, based on event ID and user ID. Updates also "volunteers" field of the event object.
+</br> Search-service: updates given event for count of volunteers.
 ```
 Example input:
 {
@@ -239,6 +246,7 @@ Outputs the updated event participation, in format of GET /participation?event=<
 ### Leave events
 POST **/participation/leave** </br>
 Let's user leave/cancel participation in a given event, based on event ID and user ID. Updates also "volunteers" field of the event object.
+</br> Search-service: updates given event for count of volunteers.
 ```
 Input and output are the same as POST /participation/enroll.
 ```
@@ -247,6 +255,7 @@ Input and output are the same as POST /participation/enroll.
 ### Mark user as arrived (verify participation)
 POST **/participation/arrived?event=<EVENT_ID>&user=<USER_ID>** </br>
 Stores user arrival to the event.
+</br> User-service: adds points of the event to user influence points.
 ```
 Input body is empty, values are in the URL.
 

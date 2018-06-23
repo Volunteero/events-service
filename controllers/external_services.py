@@ -54,3 +54,15 @@ def add_updated_event_to_search(field, value, event_id):
     json_body = json.dumps(body)
     response = requests.post(url, data=json_body, headers=headers)
     return response
+
+
+# give influence points to user after confirming their arrival to event
+def give_influence_points(points, user_id):
+    # event is duplicated to add the id field (due to model constraint)
+    body = {'points': points}
+
+    url = 'https://volunteero-altar.herokuapp.com/altar/v1/users/' + user_id + '/confirmEventParticipation'
+    headers = {'Content-type': 'application/json'}
+    json_body = json.dumps(body)
+    response = requests.post(url, data=json_body, headers=headers)
+    return response
