@@ -98,7 +98,7 @@ class MongoManageEvents:
         participants = self.participation_col.find_one({"event_id": event_id})['enrolled_participants']
         nr_participants = len(participants)
         self.events_col.update_one({'_id': ObjectId(event_id)}, {"$set": {"volunteers": nr_participants}}, upsert=True)
-        self.update_search_service('volunteers', nr_participants, id)
+        self.update_search_service('volunteers', nr_participants, event_id)
         return
 
     # add updated event to search service
